@@ -12,4 +12,4 @@ If you want, you can create KB quickly using it.
 
 The client can upload files conveniently.
 
-It is using SharePoint WCF architecture.
+It is using SharePoint WCF architecture. You can deploy it to any application server on farm.
