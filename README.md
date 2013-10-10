@@ -9,3 +9,5 @@ This project is used to manage SharePoint Libraries. It will build a portal on S
 You can visit any libraries via category tree. In addition, It includes one client and services.
 
 If you want, you can create KB quickly using it.
+
+The client can upload files conveniently.
