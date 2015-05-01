@@ -902,6 +902,23 @@ namespace stockassistant
                                                     }
                                                 }
                                             }
+
+                                            if (!selected)
+                                            {
+                                                for (i = 0; i < listviewdataforno.Count; i++)
+                                                {
+                                                    tag = listviewdatafortag[i];
+                                                    price = listviewdataforprice[i];
+                                                    for (int j = i+1; j < listviewdataforno.Count; j++)
+                                                    {
+                                                        if (listviewdataforno[i] == listviewdataforno[j] && listviewdatafortag[i] == listviewdatafortag[j] && listviewdataforprice[i] == listviewdataforprice[j])
+                                                        {
+                                                            SelectOneRow(listviewhwnd, j);
+                                                            selected = true;
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
