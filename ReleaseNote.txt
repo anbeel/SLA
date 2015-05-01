@@ -1,8 +1,0 @@
-﻿V3.65 2014.11.22
-
-feixin changed its UI.
-
-V3.7 2015.04.28
-
-1.same buy order in order list.
-2.should sell after order done, but order the buy order.
