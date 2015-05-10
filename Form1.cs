@@ -18,6 +18,8 @@ namespace stockassistant
         private List<Stock> Stocks;
         private bool isstarted;
         private bool initsuccess;
+        private bool downloaded;
+        private bool uploaded;
         private Utility.TodayStatus status = Utility.TodayStatus.Normal;
         private bool ispause;
         private WebBrowerControl browser = new WebBrowerControl(1);
@@ -1266,6 +1268,11 @@ namespace stockassistant
                     else if (dt.Hour == 9 && dt.Minute < 10)
                     {
                         timer1.Interval = 60000;
+                        if (!downloaded)
+                            if (!DownloadStockData())
+                                downloaded = false;
+                            else
+                                initsuccess = false;
                         InitPrice();
                         Notifyme();
                     }
@@ -1273,6 +1280,10 @@ namespace stockassistant
                 else if (dt.Hour == 15 && dt.Minute <= 10)
                 {
                     initsuccess = false;
+                    downloaded = false;
+                    if (!uploaded)
+                        if (!UploadStockData())
+                            uploaded = false;
                 }
                 else if (dt.Hour == 8 )
                 {
@@ -1386,6 +1397,38 @@ namespace stockassistant
                 timer1.Dispose();
                 timer1 = null;
             }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            if (DownloadStockData())
+            {
+                LoadData();
+                MessageBox.Show("Download success!");
+            }
+        }
+
+        private bool DownloadStockData()
+        {
+            downloaded = true;
+            BaiduPan pan = new BaiduPan();
+            return pan.DownloadFile("/stock/stock.data", Path.Combine(System.Environment.CurrentDirectory, "stock.data"));
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            if(UploadStockData())
+            {
+                MessageBox.Show("Upload success!");
+            }
+        }
+
+        private bool UploadStockData()
+        {
+            uploaded = true;
+            SaveData();
+            BaiduPan pan = new BaiduPan();
+            return pan.UploadFile("/stock/stock.data", Path.Combine(System.Environment.CurrentDirectory, "stock.data"));
         }
     }
 }

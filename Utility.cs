@@ -1274,5 +1274,24 @@ namespace stockassistant
             return System.Convert.ToBase64String(ciphertext, 0, ciphertext.Length);
         }
 
+        public static long GetCurrentTimeStamp()
+        {
+            DateTime dt = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1));
+            return (long)(DateTime.Now - dt).TotalSeconds;
+        }
+
+        public static long GetTimeStamp(DateTime dt)
+        {
+            DateTime dtStart = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1));
+            return (long)(dt - dtStart).TotalSeconds;
+        }
+
+        public static DateTime GetTime(string timeStamp)
+        {
+            DateTime dtStart = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1));
+            long lTime = long.Parse(timeStamp + "0000000");
+            TimeSpan toNow = new TimeSpan(lTime); return dtStart.Add(toNow);
+        }
+
     }
 }
