@@ -25,6 +25,7 @@ namespace stockassistant
         private WebBrowerControl browser = new WebBrowerControl(1);
         private Dictionary<string, string> ordersforbuy = new Dictionary<string, string>();
         private Dictionary<string, string> ordersforsell = new Dictionary<string, string>();
+        private bool disablesynced = System.Configuration.ConfigurationSettings.AppSettings["disablesync"] !=null? bool.Parse(System.Configuration.ConfigurationSettings.AppSettings["disablesync"]):false; 
 
         #region Method
 
@@ -1268,11 +1269,20 @@ namespace stockassistant
                     else if (dt.Hour == 9 && dt.Minute < 10)
                     {
                         timer1.Interval = 60000;
-                        if (!downloaded)
-                            if (!DownloadStockData())
-                                downloaded = false;
-                            else
-                                initsuccess = false;
+                        if (!disablesynced)
+                        {
+                            if (!downloaded)
+                                if (!DownloadStockData())
+                                {
+                                    downloaded = false;
+                                    Utility.Log("failed to download data.");
+                                }
+                                else
+                                {
+                                    LoadData();
+                                    initsuccess = false;
+                                }
+                        }
                         InitPrice();
                         Notifyme();
                     }
@@ -1281,9 +1291,12 @@ namespace stockassistant
                 {
                     initsuccess = false;
                     downloaded = false;
-                    if (!uploaded)
-                        if (!UploadStockData())
-                            uploaded = false;
+                    if (!disablesynced)
+                    {
+                        if (!uploaded)
+                            if (!UploadStockData())
+                                uploaded = false;
+                    }
                 }
                 else if (dt.Hour == 8 )
                 {
