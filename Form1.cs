@@ -1281,6 +1281,7 @@ namespace stockassistant
                                 {
                                     LoadData();
                                     initsuccess = false;
+                                    uploaded = false;
                                 }
                         }
                         InitPrice();
@@ -1295,7 +1296,10 @@ namespace stockassistant
                     {
                         if (!uploaded)
                             if (!UploadStockData())
+                            {
+                                Utility.Log("failed to upload data.");
                                 uploaded = false;
+                            }
                     }
                 }
                 else if (dt.Hour == 8 )
