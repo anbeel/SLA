@@ -96,6 +96,8 @@ namespace stockassistant
                 {
                     stock.MakeBuy = false;
                     stock.MakeSell = false;
+                    stock.CanBuy = true;
+                    stock.CanSell = true;
                 }
                 foreach (string order in orders)
                 {
@@ -120,7 +122,6 @@ namespace stockassistant
 
         private void UpdateTodayData()
         {
-            bool changed = false;
             try
             {
                 IntPtr hwnd = Utility.GetWindow();
@@ -163,17 +164,21 @@ namespace stockassistant
                                                 break;
                                             }
                                             ordersforbuy[stock.NO] = items[3];
+                                            stock.CanBuy = false;
+                                            stock.CanSell = true;
                                         }
                                         else
                                         {
                                             ordersforbuy.Add(stock.NO, items[3]);
+                                            stock.CanBuy = false;
+                                            stock.CanSell = true;
                                         }
-                                        changed = true;
+                                        //changed = true;
                                         stock.LastBuyPrice = buyprice;
                                         stock.Name = items[5];
                                         if (!stock.IsWatch)
                                         {
-                                            MakeOrder(false, stock.NO, buyprice.ToString("f2"), items[1]);
+                                            MakeOrder(stock.NO, buyprice.ToString("f2"), items[1]);
                                             stock.MakeSell = true;
                                             SendSMS("成功买入:" + stock.NO + ",名称:" + items[5] + ",价格:" + buyprice.ToString("f2") + ",数量:" + items[4] + ",编号" + ordersforbuy[stock.NO] + ",时间:" + items[6] + "。");
                                         }
@@ -183,6 +188,8 @@ namespace stockassistant
                                         if (!ordersforbuy.ContainsKey(stock.NO))
                                         {
                                             ordersforbuy.Add(stock.NO, items[3]);
+                                            stock.CanBuy = false;
+                                            stock.CanSell = true;
                                         }
                                         else
                                         {
@@ -191,13 +198,15 @@ namespace stockassistant
                                             // same price, different no.
                                             if (no > order)
                                             {
-                                                changed = true;
+                                                //changed = true;
                                                 ordersforbuy[stock.NO] = items[3];
                                                 stock.LastBuyPrice = buyprice;
                                                 stock.Name = items[5];
+                                                stock.CanBuy = false;
+                                                stock.CanSell = true;
                                                 if (!stock.IsWatch)
                                                 {
-                                                    MakeOrder(false, stock.NO, buyprice.ToString("f2"), items[1]);
+                                                    MakeOrder(stock.NO, buyprice.ToString("f2"), items[1]);
                                                     stock.MakeSell = true;
                                                     SendSMS("成功买入:" + stock.NO + ",名称:" + items[5] + ",价格:" + buyprice.ToString("f2") + ",数量:" + items[4] + ",编号" + ordersforbuy[stock.NO] + ",时间:" + items[6] + "。");
                                                 }
@@ -224,17 +233,20 @@ namespace stockassistant
                                                 break;
                                             }
                                             ordersforsell[stock.NO] = items[3];
+                                            stock.CanSell = false;
+                                            stock.CanBuy = true;
                                         }
                                         else
                                         {
                                             ordersforsell.Add(stock.NO, items[3]);
+                                            stock.CanSell = false;
+                                            stock.CanBuy = true;
                                         }
-                                        changed = true;
                                         stock.LastSellPrice = sellprice;
                                         stock.Name = items[5];
                                         if (!stock.IsWatch)
                                         {
-                                            MakeOrder(false, stock.NO, sellprice.ToString("f2"), items[1]);
+                                            MakeOrder(stock.NO, sellprice.ToString("f2"), items[1]);
                                             stock.MakeBuy = true;
                                             SendSMS("成功卖出:" + stock.NO + ",名称:" + items[5] + ",价格:" + sellprice.ToString("f2") + ",数量:" + items[4] + ",编号" + ordersforsell[stock.NO] + ",时间:" + items[6] + "。");
                                         }
@@ -244,6 +256,8 @@ namespace stockassistant
                                         if (!ordersforsell.ContainsKey(stock.NO))
                                         {
                                             ordersforsell.Add(stock.NO, items[3]);
+                                            stock.CanSell = false;
+                                            stock.CanBuy = true;
                                         }
                                         else
                                         {
@@ -252,13 +266,14 @@ namespace stockassistant
                                             // same price, different no.
                                             if (no > order)
                                             {
-                                                changed = true;
                                                 ordersforsell[stock.NO] = items[3];
                                                 stock.LastSellPrice = sellprice;
                                                 stock.Name = items[5];
+                                                stock.CanSell = false;
+                                                stock.CanBuy = true;
                                                 if (!stock.IsWatch)
                                                 {                                                    
-                                                    MakeOrder(false, stock.NO, sellprice.ToString("f2"), items[1]);
+                                                    MakeOrder(stock.NO, sellprice.ToString("f2"), items[1]);
                                                     stock.MakeBuy = true;
                                                     SendSMS("成功卖出:" + stock.NO + ",名称:" + items[5] + ",价格:" + sellprice.ToString("f2") + ",数量:" + items[4] + ",编号" + ordersforsell[stock.NO] + ",时间:" + items[6] + "。");
                                                 }
@@ -275,13 +290,6 @@ namespace stockassistant
             catch (Exception ex)
             {
                 Utility.Log("UpdateTodayDate failed: " + ex.Message + "//" + ex.StackTrace);
-            }
-            finally
-            {
-                if (changed)
-                {
-                    SaveData();
-                }
             }
         }
 
@@ -375,7 +383,6 @@ namespace stockassistant
                     Utility.Log("Check the status:" + status.ToString());
                     return;
                 }
-                bool changed = false;
                 if (Utility.ClickSell(hwnd))
                 {
                     System.Threading.Thread.Sleep(1000);
@@ -391,26 +398,22 @@ namespace stockassistant
                         if (stock.HighPrice < price)
                         {
                             stock.HighPrice = price;
-                            changed = true;
                         }
                         if (stock.LowPrice > price)
                         {
                             stock.LowPrice = price;
-                            changed = true;
                         }
                         if (stock.Buy1Price == 0)
                         {
                             stock.Buy1Price = price;
-                            changed = true;
                         }
                         if (stock.Sell1Price == 0)
                         {
                             stock.Sell1Price = price;
-                            changed = true;
                         }
                         if (!stock.IsWatch)
                         {
-                            if (!stock.MakeBuy)
+                            if (!stock.MakeBuy && stock.CanBuy)
                             {
                                 if (status != Utility.TodayStatus.BuyOverFlow)
                                 {
@@ -422,7 +425,7 @@ namespace stockassistant
                                     }
                                 }
                             }
-                            else if (!stock.MakeSell)
+                            else if (!stock.MakeSell && stock.CanSell)
                             {
                                 if (status != Utility.TodayStatus.SellOverFlow)
                                 {
@@ -437,10 +440,6 @@ namespace stockassistant
                         }
                         stock.LastUpdatedTime = Utility.GetLastUpdatedTime();
                     }
-                }
-                if (changed)
-                {
-                    SaveData();
                 }
             }
             catch (Exception ex)
@@ -506,7 +505,11 @@ namespace stockassistant
                         Name = strs[11],
                         HandNumber = int.Parse(strs[12]),
                         IsWatch = bool.Parse(strs[13]),
-                        CurPrice = decimal.Parse(strs[14])
+                        CurPrice = decimal.Parse(strs[14]),
+                        MakeBuy = false,
+                        MakeSell = false,
+                        CanSell = true,
+                        CanBuy = true
                     };
                     Stocks.Add(stock);                    
                     listBox1.Items.Add("编号:"+stock.NO+",名称:" + stock.Name + ",数量:"+ stock.HandNumber.ToString()+",价格:"+ stock.CurPrice.ToString("f2")+",最后更新时间:"+stock.LastUpdatedTime);
@@ -573,8 +576,7 @@ namespace stockassistant
                 }
                 if (ischanged)
                 {
-                    MakeOrder(true, "", "", "");
-                    SaveData();
+                    MakeOrder("", "", "");
                 }
             }
             catch (Exception ex)
@@ -619,7 +621,7 @@ namespace stockassistant
             }
         }
 
-        private void MakeOrder(bool initial, string stockno, string orderprice, string tag)
+        private void MakeOrder(string stockno, string orderprice, string tag)
         {
             try
             {
@@ -637,9 +639,8 @@ namespace stockassistant
                     }
                     else if (stockno == stock.NO)
                     {
-                        //Log(String.Format("continue buy stock: no:{0}, buyprice:{1}", stock.NO, orderprice));
-                        RemoveOrders(Utility.OrderStatus.All, stock.NO);
-                        if (tag == "卖出")
+                        //RemoveOrders(Utility.OrderStatus.All, stock.NO);
+                        if (tag == "卖出" && stock.CanBuy)
                         {
                             decimal price = decimal.Parse(orderprice);
                             price = price - (price * (decimal)0.025);
@@ -658,9 +659,8 @@ namespace stockassistant
                             {
                                 Buy(stock.NO, price.ToString("f2"), stock.Number.ToString());
                             }
-                            //stock.MakeBuy = true;
                         }
-                        else if (tag == "买入")
+                        else if (tag == "买入" && stock.CanSell)
                         {
                             decimal price = decimal.Parse(orderprice);
                             price = price + (price * (decimal)0.025);
@@ -679,12 +679,11 @@ namespace stockassistant
                             {
                                 Sell(stock.NO, price.ToString("f2"), stock.Number.ToString());
                             }
-                            //stock.MakeSell = true;
                         }
                         return;
                     }
 
-                    if (!stock.MakeBuy)
+                    if (!stock.MakeBuy && stock.CanBuy)
                     {
                         decimal price = GetBuyPrice(stock,0);
                         if (price != 0)
@@ -694,7 +693,7 @@ namespace stockassistant
                         }
                     }
 
-                    if (!stock.MakeSell)
+                    if (!stock.MakeSell && stock.CanSell)
                     {
                         decimal price = GetSellPrice(stock,0);
                         if (price != 0)
@@ -737,7 +736,7 @@ namespace stockassistant
             }
             if (stock.RaiseStage)
             {
-                for (int i = 0; i < 2; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     nextprice = nextprice - (nextprice * decimal.Parse("0.02"));
                     if (oldprice >= nextprice)
@@ -758,7 +757,7 @@ namespace stockassistant
             }
             else
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     nextprice = nextprice - (nextprice * decimal.Parse("0.04"));
                     if (oldprice >= nextprice)
@@ -797,6 +796,11 @@ namespace stockassistant
                     return 0;
                 }
             }
+            decimal lowestPrice = stock.PrePrice * decimal.Parse("0.901");
+            if (nextprice < lowestPrice)
+            {
+                nextprice = lowestPrice;
+            }
             return nextprice;
         }
 
@@ -826,7 +830,7 @@ namespace stockassistant
             decimal nextprice = stock.LowPrice;
             if (stock.RaiseStage)
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     nextprice = nextprice + (nextprice * decimal.Parse("0.04"));
                     if (oldprice <= nextprice)
@@ -847,7 +851,7 @@ namespace stockassistant
             }
             else
             {
-                for (int i = 0; i < 2; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     nextprice = nextprice + (nextprice * decimal.Parse("0.02"));
                     if (oldprice <= nextprice)
@@ -890,6 +894,11 @@ namespace stockassistant
                 }
             }
             //}
+            decimal higestPrice = stock.PrePrice * decimal.Parse("1.099");
+            if (nextprice > higestPrice)
+            {
+                nextprice = higestPrice;
+            }
             return nextprice;
         }
 
@@ -1258,8 +1267,6 @@ namespace stockassistant
                             Application.DoEvents();                            
                             UpdateTodayData();
                             Application.DoEvents();
-                            UpdateStockStatus();
-                            Application.DoEvents();
                             UpdatePrice();
                             Application.DoEvents();
                             RemoveOrders(Utility.OrderStatus.Repeated, "");
@@ -1309,6 +1316,7 @@ namespace stockassistant
                 }
                 else
                 {
+                    SaveData();
                     CloseStock();
                 }
             }
