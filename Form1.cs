@@ -92,13 +92,6 @@ namespace stockassistant
                         break;
                     }
                 }
-                foreach (Stock stock in Stocks)
-                {
-                    stock.MakeBuy = false;
-                    stock.MakeSell = false;
-                    stock.CanBuy = true;
-                    stock.CanSell = true;
-                }
                 foreach (string order in orders)
                 {
                     string[] items = order.Split(',');
@@ -1316,7 +1309,6 @@ namespace stockassistant
                 }
                 else
                 {
-                    SaveData();
                     CloseStock();
                 }
             }
