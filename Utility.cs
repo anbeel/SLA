@@ -854,6 +854,7 @@ namespace stockassistant
                                         {
                                             string tag = listviewdatafortag[i];
                                             string price = listviewdataforprice[i];
+                                            bool find = false;
                                             for (int j = 0; j < listviewdataforno.Count; j++)
                                             {
                                                 if (listviewdataforno[i] == listviewdataforno[j])
@@ -864,6 +865,7 @@ namespace stockassistant
                                                         if ((tag == listviewdatafortag[j]) && (decimal.Parse(listviewdataforprice[j]) > decimal.Parse(price)))
                                                         {
                                                             price = listviewdataforprice[j];
+                                                            find = true;
                                                         }
                                                     }
                                                     else if (tag == "卖出")
@@ -872,12 +874,13 @@ namespace stockassistant
                                                         if ((tag == listviewdatafortag[j]) && (decimal.Parse(listviewdataforprice[j]) < decimal.Parse(price)))
                                                         {
                                                             price = listviewdataforprice[j];
+                                                            find = true;
                                                         }
 
                                                     }
                                                 }
                                             }
-                                            if (price != listviewdataforprice[i])
+                                            if (price != listviewdataforprice[i] || !find)
                                             {
                                                 for (int j = 0; j < listviewdataforno.Count; j++)
                                                 {

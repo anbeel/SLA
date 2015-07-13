@@ -537,10 +537,13 @@ namespace stockassistant
                             decimal price = Utility.GetInitBuyPrice(dlghwnd, stock.NO);
                             if (price != 0)
                             {
+                                stock.IsWatch = false;
                                 stock.Sell1Price = price;
                                 stock.LastUpdatedTime = Utility.GetLastUpdatedTime();
                                 ischanged = true;
                             }
+                            else
+                                stock.IsWatch = true;
                         }
                     }
                 }
@@ -556,6 +559,7 @@ namespace stockassistant
                             decimal price = Utility.GetInitSellPrice(dlghwnd, stock.NO);
                             if (price != 0)
                             {
+                                stock.IsWatch = false;
                                 stock.Buy1Price = price;
                                 if (stock.PrePrice == 0)
                                 {
@@ -564,6 +568,8 @@ namespace stockassistant
                                 stock.LastUpdatedTime = Utility.GetLastUpdatedTime();
                                 ischanged = true;
                             }
+                            else
+                                stock.IsWatch = true;
                         }
                     }
                 }
@@ -632,9 +638,9 @@ namespace stockassistant
                     }
                     else if (stockno == stock.NO)
                     {
-                        //RemoveOrders(Utility.OrderStatus.All, stock.NO);
                         if (tag == "卖出" && stock.CanBuy)
                         {
+                            RemoveOrders(Utility.OrderStatus.Buy, stock.NO);
                             decimal price = decimal.Parse(orderprice);
                             price = price - (price * (decimal)0.025);
                             if (stock.LastBuyPrice != 0)
@@ -655,6 +661,7 @@ namespace stockassistant
                         }
                         else if (tag == "买入" && stock.CanSell)
                         {
+                            RemoveOrders(Utility.OrderStatus.Sell, stock.NO);
                             decimal price = decimal.Parse(orderprice);
                             price = price + (price * (decimal)0.025);
                             if (stock.LastSellPrice != 0)
@@ -1309,6 +1316,7 @@ namespace stockassistant
                 }
                 else
                 {
+                    timer1.Interval = 3600000;
                     CloseStock();
                 }
             }
