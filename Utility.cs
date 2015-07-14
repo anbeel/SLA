@@ -474,6 +474,7 @@ namespace stockassistant
             System.Threading.Thread.Sleep(2000);
             edithwnd = GetHwnd(dlghwnd, edithwnd, "Edit", string.Empty);
             string buy1price = GetControlText(edithwnd);
+            if (String.IsNullOrEmpty(buy1price)) return 0;
             decimal result =0;
             decimal.TryParse(buy1price, out result);
             return result;
@@ -486,6 +487,7 @@ namespace stockassistant
             System.Threading.Thread.Sleep(2000);
             edithwnd = GetHwnd(dlghwnd, edithwnd, "Edit", string.Empty);
             string sell1price = GetControlText(edithwnd);
+            if (String.IsNullOrEmpty(sell1price)) return 0;
             decimal result = 0;
             decimal.TryParse(sell1price, out result);
             return result;
