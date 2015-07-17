@@ -1434,9 +1434,16 @@ namespace stockassistant
 
         private bool DownloadStockData()
         {
-            downloaded = true;
-            BaiduPan pan = new BaiduPan();
-            return pan.DownloadFile("/stock/stock.data", Path.Combine(System.Environment.CurrentDirectory, "stock.data"));
+            try
+            {
+                downloaded = true;
+                BaiduPan pan = new BaiduPan();
+                return pan.DownloadFile("/stock/stock.data", Path.Combine(System.Environment.CurrentDirectory, "stock.data"));
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -1449,10 +1456,17 @@ namespace stockassistant
 
         private bool UploadStockData()
         {
-            uploaded = true;
-            SaveData();
-            BaiduPan pan = new BaiduPan();
-            return pan.UploadFile("/stock/stock.data", Path.Combine(System.Environment.CurrentDirectory, "stock.data"));
+            try
+            {
+                uploaded = true;
+                SaveData();
+                BaiduPan pan = new BaiduPan();
+                return pan.UploadFile("/stock/stock.data", Path.Combine(System.Environment.CurrentDirectory, "stock.data"));
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
