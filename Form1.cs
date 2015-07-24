@@ -1244,8 +1244,7 @@ namespace stockassistant
                 DateTime dt = System.DateTime.Now;
                 if ((dt.DayOfWeek == DayOfWeek.Saturday) || (dt.DayOfWeek == DayOfWeek.Sunday))
                 {
-                    timer1.Interval = 86400000/4;
-                    CloseStock();
+                    timer1.Interval = 3600000;
                 }
                 else if ((dt.Hour >= 9 && dt.Hour < 11) || ((dt.Hour == 11) && (dt.Minute <= 30)) || (dt.Hour >= 13 && dt.Hour < 15))
                 {
