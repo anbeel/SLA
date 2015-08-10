@@ -168,6 +168,7 @@ namespace stockassistant
                                         }
                                         //changed = true;
                                         stock.LastBuyPrice = buyprice;
+                                        stock.LastSellPrice = buyprice;
                                         stock.Name = items[5];
                                         if (!stock.IsWatch)
                                         {
@@ -194,6 +195,7 @@ namespace stockassistant
                                                 //changed = true;
                                                 ordersforbuy[stock.NO] = items[3];
                                                 stock.LastBuyPrice = buyprice;
+                                                stock.LastSellPrice = buyprice;
                                                 stock.Name = items[5];
                                                 stock.CanBuy = false;
                                                 stock.CanSell = true;
@@ -236,6 +238,7 @@ namespace stockassistant
                                             stock.CanBuy = true;
                                         }
                                         stock.LastSellPrice = sellprice;
+                                        stock.LastBuyPrice = sellprice;
                                         stock.Name = items[5];
                                         if (!stock.IsWatch)
                                         {
@@ -261,6 +264,7 @@ namespace stockassistant
                                             {
                                                 ordersforsell[stock.NO] = items[3];
                                                 stock.LastSellPrice = sellprice;
+                                                stock.LastBuyPrice = sellprice;
                                                 stock.Name = items[5];
                                                 stock.CanSell = false;
                                                 stock.CanBuy = true;
@@ -391,10 +395,12 @@ namespace stockassistant
                         if (stock.HighPrice < price)
                         {
                             stock.HighPrice = price;
+                            stock.RaiseStage = true;
                         }
                         if (stock.LowPrice > price)
                         {
                             stock.LowPrice = price;
+                            stock.RaiseStage = false;
                         }
                         if (stock.Buy1Price == 0)
                         {
