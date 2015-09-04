@@ -648,7 +648,10 @@ namespace stockassistant
                         {
                             RemoveOrders(Utility.OrderStatus.Buy, stock.NO);
                             decimal price = decimal.Parse(orderprice);
-                            price = price - (price * (decimal)0.025);
+                            if (price * stock.HandNumber > 3000)
+                                price = price - (price * (decimal)0.025);
+                            else
+                                price = price - (price * (decimal)0.03);
                             if (stock.LastBuyPrice != 0)
                             {
                                 if (price <= stock.LastBuyPrice)
@@ -669,7 +672,10 @@ namespace stockassistant
                         {
                             RemoveOrders(Utility.OrderStatus.Sell, stock.NO);
                             decimal price = decimal.Parse(orderprice);
-                            price = price + (price * (decimal)0.025);
+                            if (price * stock.Number > 3000)
+                                price = price + (price * (decimal)0.025);
+                            else
+                                price = price + (price * (decimal)0.03);
                             if (stock.LastSellPrice != 0)
                             {
                                 if (price >= stock.LastSellPrice)
@@ -744,17 +750,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    nextprice = nextprice - (nextprice * decimal.Parse("0.02"));
-                    if (oldprice >= nextprice)
-                    {
-                        break;
-                    }
                     nextprice = nextprice - (nextprice * decimal.Parse("0.03"));
                     if (oldprice >= nextprice)
                     {
                         break;
                     }
                     nextprice = nextprice - (nextprice * decimal.Parse("0.04"));
+                    if (oldprice >= nextprice)
+                    {
+                        break;
+                    }
+                    nextprice = nextprice - (nextprice * decimal.Parse("0.05"));
                     if (oldprice >= nextprice)
                     {
                         break;
@@ -765,17 +771,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 10; i++)
                 {
+                    nextprice = nextprice - (nextprice * decimal.Parse("0.05"));
+                    if (oldprice >= nextprice)
+                    {
+                        break;
+                    }
                     nextprice = nextprice - (nextprice * decimal.Parse("0.04"));
                     if (oldprice >= nextprice)
                     {
                         break;
                     }
                     nextprice = nextprice - (nextprice * decimal.Parse("0.03"));
-                    if (oldprice >= nextprice)
-                    {
-                        break;
-                    }
-                    nextprice = nextprice - (nextprice * decimal.Parse("0.02"));
                     if (oldprice >= nextprice)
                     {
                         break;
@@ -789,7 +795,7 @@ namespace stockassistant
                     nextprice = nextprice - (stock.PrePrice - stock.Buy1Price);
                 }
             }
-            decimal borderprice = nextprice + (nextprice * decimal.Parse("0.02"));
+            decimal borderprice = nextprice + (nextprice * decimal.Parse("0.029"));
             // too far
             //if (borderprice < oldprice)
             //{
@@ -838,17 +844,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 10; i++)
                 {
+                    nextprice = nextprice + (nextprice * decimal.Parse("0.05"));
+                    if (oldprice <= nextprice)
+                    {
+                        break;
+                    }
                     nextprice = nextprice + (nextprice * decimal.Parse("0.04"));
                     if (oldprice <= nextprice)
                     {
                         break;
                     }
                     nextprice = nextprice + (nextprice * decimal.Parse("0.03"));
-                    if (oldprice <= nextprice)
-                    {
-                        break;
-                    }
-                    nextprice = nextprice + (nextprice * decimal.Parse("0.02"));
                     if (oldprice <= nextprice)
                     {
                         break;
@@ -859,17 +865,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    nextprice = nextprice + (nextprice * decimal.Parse("0.02"));
-                    if (oldprice <= nextprice)
-                    {
-                        break;
-                    }
                     nextprice = nextprice + (nextprice * decimal.Parse("0.03"));
                     if (oldprice <= nextprice)
                     {
                         break;
                     }
                     nextprice = nextprice + (nextprice * decimal.Parse("0.04"));
+                    if (oldprice <= nextprice)
+                    {
+                        break;
+                    }
+                    nextprice = nextprice + (nextprice * decimal.Parse("0.05"));
                     if (oldprice <= nextprice)
                     {
                         break;
@@ -883,7 +889,7 @@ namespace stockassistant
                     nextprice = nextprice + (stock.Sell1Price - stock.PrePrice);
                 }
             }
-            decimal borderprice = nextprice - (nextprice * decimal.Parse("0.02"));
+            decimal borderprice = nextprice - (nextprice * decimal.Parse("0.029"));
             //too far
             //if (borderprice > oldprice)
             //{
