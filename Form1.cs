@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.IO;
 using System.Reflection;
-
+using System.Configuration;
 
 namespace stockassistant
 {
@@ -25,7 +25,8 @@ namespace stockassistant
         private WebBrowerControl browser = new WebBrowerControl(1);
         private Dictionary<string, string> ordersforbuy = new Dictionary<string, string>();
         private Dictionary<string, string> ordersforsell = new Dictionary<string, string>();
-        private bool disablesynced = System.Configuration.ConfigurationSettings.AppSettings["disablesync"] !=null? bool.Parse(System.Configuration.ConfigurationSettings.AppSettings["disablesync"]):false; 
+        private bool disablesynced = ConfigurationSettings.AppSettings["disablesync"] !=null? bool.Parse(System.Configuration.ConfigurationSettings.AppSettings["disablesync"]):false;
+        private bool panenable = ConfigurationSettings.AppSettings["panenable"] != null ? bool.Parse(System.Configuration.ConfigurationSettings.AppSettings["panenable"]) : false;
 
         #region Method
 
@@ -1289,7 +1290,7 @@ namespace stockassistant
                         timer1.Interval = 60000;
                         if (!disablesynced)
                         {
-                            if (!downloaded)
+                            if (!downloaded && panenable)
                                 if (!DownloadStockData())
                                 {
                                     downloaded = false;
@@ -1312,7 +1313,7 @@ namespace stockassistant
                     downloaded = false;
                     if (!disablesynced)
                     {
-                        if (!uploaded)
+                        if (!uploaded && panenable)
                             if (!UploadStockData())
                             {
                                 Utility.Log("failed to upload data.");
