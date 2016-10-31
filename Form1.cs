@@ -27,6 +27,7 @@ namespace stockassistant
         private Dictionary<string, string> ordersforsell = new Dictionary<string, string>();
         private bool disablesynced = ConfigurationSettings.AppSettings["disablesync"] !=null? bool.Parse(System.Configuration.ConfigurationSettings.AppSettings["disablesync"]):false;
         private bool panenable = ConfigurationSettings.AppSettings["panenable"] != null ? bool.Parse(System.Configuration.ConfigurationSettings.AppSettings["panenable"]) : false;
+        private decimal wave = ConfigurationSettings.AppSettings["wave"] != null ? decimal.Parse(System.Configuration.ConfigurationSettings.AppSettings["wave"].ToString()) : decimal.Parse("0.03");
 
         #region Method
 
@@ -461,9 +462,9 @@ namespace stockassistant
                 for (int i = 0; i < Stocks.Count; i++)
                 {
                     stock = Stocks[i] as Stock;
-                    string resstock = String.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14}", stock.NO, stock.Number,
+                    string resstock = String.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15}", stock.NO, stock.Number,
                         stock.LowPrice, stock.HighPrice, stock.RaiseStage, stock.PrePrice, stock.Buy1Price, stock.Sell1Price,
-                        stock.LastBuyPrice, stock.LastSellPrice, Utility.GetLastUpdatedTime(),stock.Name,stock.HandNumber,stock.IsWatch,stock.CurPrice);
+                        stock.LastBuyPrice, stock.LastSellPrice, Utility.GetLastUpdatedTime(),stock.Name,stock.HandNumber,stock.IsWatch,stock.CurPrice,stock.StartNum);
                     strstocks[i] = resstock;
                 }
                 File.WriteAllLines("stock.data", strstocks);
@@ -485,7 +486,7 @@ namespace stockassistant
                 foreach (string strstock in strstocks)
                 {
                     string[] strs = strstock.Split(',');
-                    if (strs.Length != 15)
+                    if (strs.Length != 16)
                     {
                         throw new Exception("wrong data structure");
                     }
@@ -506,13 +507,18 @@ namespace stockassistant
                         HandNumber = int.Parse(strs[12]),
                         IsWatch = bool.Parse(strs[13]),
                         CurPrice = decimal.Parse(strs[14]),
+                        StartNum = int.Parse(strs[15]),
                         MakeBuy = false,
                         MakeSell = false,
                         CanSell = true,
                         CanBuy = true
                     };
-                    Stocks.Add(stock);                    
-                    listBox1.Items.Add("编号:"+stock.NO+",名称:" + stock.Name + ",数量:"+ stock.HandNumber.ToString()+",价格:"+ stock.CurPrice.ToString("f2")+",最后更新时间:"+stock.LastUpdatedTime);
+                    if (stock.StartNum < 3)
+                        stock.StartNum = 3;
+                    else if (stock.StartNum > 10)
+                        stock.StartNum = 10;
+                    Stocks.Add(stock);
+                    listBox1.Items.Add("编号:" + stock.NO + ",名称:" + stock.Name + ",数量:" + stock.HandNumber.ToString() + ",价格:" + stock.CurPrice.ToString("f2") + ",最后更新时间:" + stock.LastUpdatedTime);
                 }
             }
             catch (Exception ex)
@@ -649,10 +655,7 @@ namespace stockassistant
                         {
                             RemoveOrders(Utility.OrderStatus.Buy, stock.NO);
                             decimal price = decimal.Parse(orderprice);
-                            if (price * stock.HandNumber > 3000)
-                                price = price - (price * (decimal)0.025);
-                            else
-                                price = price - (price * (decimal)0.03);
+                            price = price - (price * wave);
                             if (stock.LastBuyPrice != 0)
                             {
                                 if (price <= stock.LastBuyPrice)
@@ -673,10 +676,7 @@ namespace stockassistant
                         {
                             RemoveOrders(Utility.OrderStatus.Sell, stock.NO);
                             decimal price = decimal.Parse(orderprice);
-                            if (price * stock.Number > 3000)
-                                price = price + (price * (decimal)0.025);
-                            else
-                                price = price + (price * (decimal)0.03);
+                            price = price + (price * wave);
                             if (stock.LastSellPrice != 0)
                             {
                                 if (price >= stock.LastSellPrice)
@@ -751,17 +751,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    nextprice = nextprice - (nextprice * decimal.Parse("0.03"));
+                    nextprice = nextprice - (nextprice * decimal.Parse(((stock.StartNum - 2) / 100).ToString()));
                     if (oldprice >= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice - (nextprice * decimal.Parse("0.04"));
+                    nextprice = nextprice - (nextprice * decimal.Parse(((stock.StartNum - 1) / 100).ToString()));
                     if (oldprice >= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice - (nextprice * decimal.Parse("0.05"));
+                    nextprice = nextprice - (nextprice * decimal.Parse((stock.StartNum / 100).ToString()));
                     if (oldprice >= nextprice)
                     {
                         break;
@@ -772,17 +772,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    nextprice = nextprice - (nextprice * decimal.Parse("0.05"));
+                    nextprice = nextprice - (nextprice * decimal.Parse((stock.StartNum/100).ToString()));
                     if (oldprice >= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice - (nextprice * decimal.Parse("0.04"));
+                    nextprice = nextprice - (nextprice * decimal.Parse(((stock.StartNum - 1) / 100).ToString()));
                     if (oldprice >= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice - (nextprice * decimal.Parse("0.03"));
+                    nextprice = nextprice - (nextprice * decimal.Parse(((stock.StartNum - 2) / 100).ToString()));
                     if (oldprice >= nextprice)
                     {
                         break;
@@ -796,7 +796,7 @@ namespace stockassistant
                     nextprice = nextprice - (stock.PrePrice - stock.Buy1Price);
                 }
             }
-            decimal borderprice = nextprice + (nextprice * decimal.Parse("0.029"));
+            decimal borderprice = nextprice + (nextprice * wave);
             // too far
             //if (borderprice < oldprice)
             //{
@@ -845,17 +845,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    nextprice = nextprice + (nextprice * decimal.Parse("0.05"));
+                    nextprice = nextprice + (nextprice * decimal.Parse((stock.StartNum / 100).ToString()));
                     if (oldprice <= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice + (nextprice * decimal.Parse("0.04"));
+                    nextprice = nextprice + (nextprice * decimal.Parse(((stock.StartNum - 1) / 100).ToString()));
                     if (oldprice <= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice + (nextprice * decimal.Parse("0.03"));
+                    nextprice = nextprice + (nextprice * decimal.Parse(((stock.StartNum - 2) / 100).ToString()));
                     if (oldprice <= nextprice)
                     {
                         break;
@@ -866,17 +866,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    nextprice = nextprice + (nextprice * decimal.Parse("0.03"));
+                    nextprice = nextprice + (nextprice * decimal.Parse(((stock.StartNum - 2) / 100).ToString()));
                     if (oldprice <= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice + (nextprice * decimal.Parse("0.04"));
+                    nextprice = nextprice + (nextprice * decimal.Parse(((stock.StartNum - 1) / 100).ToString()));
                     if (oldprice <= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice + (nextprice * decimal.Parse("0.05"));
+                    nextprice = nextprice + (nextprice * decimal.Parse((stock.StartNum / 100).ToString()));
                     if (oldprice <= nextprice)
                     {
                         break;
@@ -890,7 +890,7 @@ namespace stockassistant
                     nextprice = nextprice + (stock.Sell1Price - stock.PrePrice);
                 }
             }
-            decimal borderprice = nextprice - (nextprice * decimal.Parse("0.029"));
+            decimal borderprice = nextprice - (nextprice * wave);
             //too far
             //if (borderprice > oldprice)
             //{
@@ -1224,6 +1224,7 @@ namespace stockassistant
             {
                 stock.PrePrice = stock.HighPrice;
             }
+            stock.StartNum = int.Parse(startNumber.Value.ToString());
             Stocks.Add(stock);
             SaveData();
         }
@@ -1243,6 +1244,7 @@ namespace stockassistant
                 mtxtsell1price.Text = stock.Sell1Price.ToString("f2");
                 mtxtlastbuyprice.Text = stock.LastBuyPrice.ToString("f2");
                 mtxtlastsellprice.Text = stock.LastSellPrice.ToString("f2");
+                startNumber.Value = decimal.Parse(stock.StartNum.ToString());
                 chkiswatch.Checked = stock.IsWatch;
             }
         }

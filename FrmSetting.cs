@@ -48,6 +48,7 @@ namespace stockassistant
                 decimal i = 5000;
                 decimal.TryParse(ConfigurationSettings.AppSettings["overflow"].ToString(), out i);
                 upoverflow.Value = i;
+                txtWave.Text = ConfigurationSettings.AppSettings["wave"] != null ? ConfigurationSettings.AppSettings["wave"].ToString() : "0.03"; 
             }
             catch(Exception ex)
             {
@@ -78,6 +79,10 @@ namespace stockassistant
                 UpdateAppConfig("password", Utility.Encrypt(txtPWD.Text));
             }
             UpdateAppConfig("overflow", upoverflow.Value.ToString("f0"));
+            if (txtWave.Text != string.Empty)
+            {
+                UpdateAppConfig("wave", txtWave.Text);
+            }
         }
 
         ///<summary>
