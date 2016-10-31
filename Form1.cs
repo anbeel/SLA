@@ -751,17 +751,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    nextprice = nextprice - (nextprice * decimal.Parse(((stock.StartNum - 2) / 100).ToString()));
+                    nextprice = nextprice - (nextprice * ((decimal)(stock.StartNum - 2) / 100));
                     if (oldprice >= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice - (nextprice * decimal.Parse(((stock.StartNum - 1) / 100).ToString()));
+                    nextprice = nextprice - (nextprice * ((decimal)(stock.StartNum - 1) / 100));
                     if (oldprice >= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice - (nextprice * decimal.Parse((stock.StartNum / 100).ToString()));
+                    nextprice = nextprice - (nextprice * ((decimal)stock.StartNum / 100));
                     if (oldprice >= nextprice)
                     {
                         break;
@@ -772,17 +772,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    nextprice = nextprice - (nextprice * decimal.Parse((stock.StartNum/100).ToString()));
+                    nextprice = nextprice - (nextprice * ((decimal)stock.StartNum/100));
                     if (oldprice >= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice - (nextprice * decimal.Parse(((stock.StartNum - 1) / 100).ToString()));
+                    nextprice = nextprice - (nextprice * ((decimal)(stock.StartNum - 1) / 100));
                     if (oldprice >= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice - (nextprice * decimal.Parse(((stock.StartNum - 2) / 100).ToString()));
+                    nextprice = nextprice - (nextprice * ((decimal)(stock.StartNum - 2) / 100));
                     if (oldprice >= nextprice)
                     {
                         break;
@@ -845,17 +845,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    nextprice = nextprice + (nextprice * decimal.Parse((stock.StartNum / 100).ToString()));
+                    nextprice = nextprice + (nextprice * ((decimal)stock.StartNum / 100));
                     if (oldprice <= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice + (nextprice * decimal.Parse(((stock.StartNum - 1) / 100).ToString()));
+                    nextprice = nextprice + (nextprice * ((decimal)(stock.StartNum - 1) / 100));
                     if (oldprice <= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice + (nextprice * decimal.Parse(((stock.StartNum - 2) / 100).ToString()));
+                    nextprice = nextprice + (nextprice * ((decimal)(stock.StartNum - 2) / 100));
                     if (oldprice <= nextprice)
                     {
                         break;
@@ -866,17 +866,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    nextprice = nextprice + (nextprice * decimal.Parse(((stock.StartNum - 2) / 100).ToString()));
+                    nextprice = nextprice + (nextprice * ((decimal)(stock.StartNum - 2) / 100));
                     if (oldprice <= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice + (nextprice * decimal.Parse(((stock.StartNum - 1) / 100).ToString()));
+                    nextprice = nextprice + (nextprice * ((decimal)(stock.StartNum - 1) / 100));
                     if (oldprice <= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice + (nextprice * decimal.Parse((stock.StartNum / 100).ToString()));
+                    nextprice = nextprice + (nextprice * ((decimal)stock.StartNum / 100));
                     if (oldprice <= nextprice)
                     {
                         break;
@@ -1422,7 +1422,16 @@ namespace stockassistant
             //RemoveOrders(Utility.OrderStatus.All, "300314");
             //InitPrice();
             //RemoveOrders(Utility.OrderStatus.Repeated, "");
-            GetToday();
+            //GetToday()
+            foreach (Stock stock in Stocks)
+            {
+                if (stock.NO == "300113")
+                {
+                    GetBuyPrice(stock, 0);
+                    GetSellPrice(stock, 0);
+                    break;
+                }
+            }
             //UpdateTodayData();
         }
 
