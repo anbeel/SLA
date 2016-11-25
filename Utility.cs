@@ -480,16 +480,22 @@ namespace stockassistant
             return result;
         }
 
-        public static decimal GetInitSellPrice(IntPtr dlghwnd, string stockno)
+        public static decimal GetInitSellPrice(IntPtr dlghwnd, string stockno, out int maxnum)
         {
             IntPtr edithwnd = GetHwnd(dlghwnd, IntPtr.Zero, "Edit", string.Empty);
             SendTxtMessage((int)edithwnd, 12, 0, stockno.ToCharArray());
             System.Threading.Thread.Sleep(2000);
             edithwnd = GetHwnd(dlghwnd, edithwnd, "Edit", string.Empty);
             string sell1price = GetControlText(edithwnd);
+            maxnum = 0;
             if (String.IsNullOrEmpty(sell1price)) return 0;
             decimal result = 0;
             decimal.TryParse(sell1price, out result);
+            IntPtr numberptr = GetHwnd(dlghwnd, IntPtr.Zero, "Static", "卖出数量:");
+            numberptr = GetHwnd(dlghwnd, numberptr, "Static", null);
+            numberptr = GetHwnd(dlghwnd, numberptr, "Static", null);
+            string number = GetControlText(numberptr);
+            int.TryParse(number, out maxnum);
             return result;
         }
 
@@ -765,6 +771,7 @@ namespace stockassistant
                                 List<string> listviewdataforno = GetListViewText(listviewhwnd, 1);
                                 // change 5-> 6
                                 List<string> listviewdataforprice = GetListViewText(listviewhwnd, 6);
+                                List<string> listviewdatafortype = GetListViewText(listviewhwnd, 11);
                                 bool selected = false;
                                 if (listviewdatafortag.Count == listviewdataforno.Count)
                                 {
@@ -775,8 +782,11 @@ namespace stockassistant
                                             //remove all
                                             for (int i = 0; i < listviewdataforno.Count; i++)
                                             {
-                                                SelectOneRow(listviewhwnd, i);
-                                                selected = true;
+                                                if (listviewdatafortype[i] != "申购")
+                                                {
+                                                    SelectOneRow(listviewhwnd, i);
+                                                    selected = true;
+                                                }
                                             }
                                         }
                                         else
@@ -798,7 +808,7 @@ namespace stockassistant
                                         {
                                             for (int i = 0; i < listviewdataforno.Count; i++)
                                             {
-                                                if (listviewdatafortag[i] == "买入")
+                                                if (listviewdatafortag[i] == "买入" && listviewdatafortype[i] != "申购")
                                                 {
                                                     SelectOneRow(listviewhwnd, i);
                                                     selected = true;

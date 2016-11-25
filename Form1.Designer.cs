@@ -53,14 +53,14 @@
             this.label9 = new System.Windows.Forms.Label();
             this.btnUpdate = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.startNumber = new System.Windows.Forms.NumericUpDown();
             this.chkiswatch = new System.Windows.Forms.CheckBox();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
-            this.startNumber = new System.Windows.Forms.NumericUpDown();
-            this.label10 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.numupnumber)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.startNumber)).BeginInit();
@@ -322,6 +322,37 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Detail";
             // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(167, 90);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(77, 12);
+            this.label10.TabIndex = 25;
+            this.label10.Text = "StartNumber:";
+            // 
+            // startNumber
+            // 
+            this.startNumber.Location = new System.Drawing.Point(244, 85);
+            this.startNumber.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.startNumber.Minimum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.startNumber.Name = "startNumber";
+            this.startNumber.Size = new System.Drawing.Size(60, 21);
+            this.startNumber.TabIndex = 24;
+            this.startNumber.Value = new decimal(new int[] {
+            4,
+            0,
+            0,
+            0});
+            // 
             // chkiswatch
             // 
             this.chkiswatch.AutoSize = true;
@@ -382,37 +413,6 @@
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
-            // startNumber
-            // 
-            this.startNumber.Location = new System.Drawing.Point(244, 85);
-            this.startNumber.Maximum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.startNumber.Minimum = new decimal(new int[] {
-            3,
-            0,
-            0,
-            0});
-            this.startNumber.Name = "startNumber";
-            this.startNumber.Size = new System.Drawing.Size(60, 21);
-            this.startNumber.TabIndex = 24;
-            this.startNumber.Value = new decimal(new int[] {
-            4,
-            0,
-            0,
-            0});
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(167, 90);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(77, 12);
-            this.label10.TabIndex = 25;
-            this.label10.Text = "StartNumber:";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -429,7 +429,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = " Assistant V4.3";
+            this.Text = " Assistant V4.4";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.numupnumber)).EndInit();

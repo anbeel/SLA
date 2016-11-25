@@ -340,10 +340,15 @@ namespace stockassistant
                     foreach (Stock stock in Stocks)
                     {
                         System.Threading.Thread.Sleep(1000);
-                        stock.PrePrice = Utility.GetInitSellPrice(dlghwnd, stock.NO);
+                        int maxnum;
+                        stock.PrePrice = Utility.GetInitSellPrice(dlghwnd, stock.NO, out maxnum);
                         if (stock.PrePrice != 0)
                         {
                             stock.CurPrice = stock.PrePrice;
+                            if (maxnum < stock.Number)
+                            {
+                                stock.CanSell = false;
+                            }
                             changed = true;
                         }
                         stock.Buy1Price = 0;
@@ -388,20 +393,31 @@ namespace stockassistant
                     IntPtr dlghwnd = Utility.GetSellDialog(hwnd);
                     foreach (Stock stock in Stocks)
                     {
-                        decimal price = Utility.GetInitSellPrice(dlghwnd, stock.NO);
+                        int maxnum;
+                        decimal price = Utility.GetInitSellPrice(dlghwnd, stock.NO, out maxnum);
                         if (price == 0)
                         {
                             System.Threading.Thread.Sleep(2000);
                             continue;
                         }
+                        if (maxnum < stock.Number)
+                        {
+                            stock.CanSell = false;
+                        }
                         if (stock.HighPrice < price)
                         {
                             stock.HighPrice = price;
+                            stock.LastBuyPrice = 0;
+                            RemoveOrders(Utility.OrderStatus.Buy, stock.NO);
+                            stock.MakeBuy = false;
                             stock.RaiseStage = true;
                         }
                         if (stock.LowPrice > price)
                         {
                             stock.LowPrice = price;
+                            stock.LastSellPrice = 0;
+                            RemoveOrders(Utility.OrderStatus.Sell, stock.NO);
+                            stock.MakeSell = false;
                             stock.RaiseStage = false;
                         }
                         if (stock.Buy1Price == 0)
@@ -569,7 +585,8 @@ namespace stockassistant
                         System.Threading.Thread.Sleep(1000);
                         if (stock.Buy1Price == 0)
                         {
-                            decimal price = Utility.GetInitSellPrice(dlghwnd, stock.NO);
+                            int maxnum;
+                            decimal price = Utility.GetInitSellPrice(dlghwnd, stock.NO, out maxnum);
                             if (price != 0)
                             {
                                 stock.IsWatch = false;
@@ -577,6 +594,10 @@ namespace stockassistant
                                 if (stock.PrePrice == 0)
                                 {
                                     stock.PrePrice = stock.Buy1Price;
+                                }
+                                if (maxnum < stock.Number)
+                                {
+                                    stock.CanSell = false;
                                 }
                                 stock.LastUpdatedTime = Utility.GetLastUpdatedTime();
                                 ischanged = true;
@@ -749,7 +770,7 @@ namespace stockassistant
             }
             if (stock.RaiseStage)
             {
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 15; i++)
                 {
                     nextprice = nextprice - (nextprice * ((decimal)(stock.StartNum - 2) / 100));
                     if (oldprice >= nextprice)
@@ -770,9 +791,9 @@ namespace stockassistant
             }
             else
             {
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 15; i++)
                 {
-                    nextprice = nextprice - (nextprice * ((decimal)stock.StartNum/100));
+                    nextprice = nextprice - (nextprice * ((decimal)stock.StartNum / 100));
                     if (oldprice >= nextprice)
                     {
                         break;
@@ -843,7 +864,7 @@ namespace stockassistant
             decimal nextprice = stock.LowPrice;
             if (stock.RaiseStage)
             {
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 15; i++)
                 {
                     nextprice = nextprice + (nextprice * ((decimal)stock.StartNum / 100));
                     if (oldprice <= nextprice)
@@ -864,7 +885,7 @@ namespace stockassistant
             }
             else
             {
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 15; i++)
                 {
                     nextprice = nextprice + (nextprice * ((decimal)(stock.StartNum - 2) / 100));
                     if (oldprice <= nextprice)
@@ -876,7 +897,7 @@ namespace stockassistant
                     {
                         break;
                     }
-                    nextprice = nextprice + (nextprice * ((decimal)stock.StartNum / 100));
+                    nextprice = nextprice + (nextprice * decimal.Parse((stock.StartNum / 100).ToString()));
                     if (oldprice <= nextprice)
                     {
                         break;
@@ -1414,7 +1435,18 @@ namespace stockassistant
 
         private void button4_Click(object sender, EventArgs e)
         {
-            //Utility.GetWindow();
+            IntPtr hwnd = Utility.GetWindow();
+            if (Utility.ClickSell(hwnd))
+            {
+                System.Threading.Thread.Sleep(2000);
+                IntPtr dlghwnd = Utility.GetSellDialog(hwnd);
+                int maxnum;
+                Utility.GetInitSellPrice(dlghwnd, Stocks[0].NO, out maxnum);
+                if (maxnum < Stocks[0].Number)
+                {
+                    MessageBox.Show(string.Format("{0} less than the number {1}", maxnum, Stocks[0].Number));
+                }
+            }
             //UpdateTodayData();
             //Utility.GetWindow();
             //RemoveOrders(Utility.OrderStatus.All, "");
@@ -1422,16 +1454,16 @@ namespace stockassistant
             //RemoveOrders(Utility.OrderStatus.All, "300314");
             //InitPrice();
             //RemoveOrders(Utility.OrderStatus.Repeated, "");
-            //GetToday()
-            foreach (Stock stock in Stocks)
-            {
-                if (stock.NO == "300113")
-                {
-                    GetBuyPrice(stock, 0);
-                    GetSellPrice(stock, 0);
-                    break;
-                }
-            }
+            //GetToday();
+            //foreach (Stock stock in Stocks)
+            //{
+            //    if (stock.NO == "300113")
+            //    {
+            //        GetBuyPrice(stock, 0);
+            //        GetSellPrice(stock, 0);
+            //        break;
+            //    }
+            //}
             //UpdateTodayData();
         }
 
