@@ -408,16 +408,12 @@ namespace stockassistant
                         {
                             stock.HighPrice = price;
                             stock.LastBuyPrice = 0;
-                            RemoveOrders(Utility.OrderStatus.Buy, stock.NO);
-                            stock.MakeBuy = false;
                             stock.RaiseStage = true;
                         }
                         if (stock.LowPrice > price)
                         {
                             stock.LowPrice = price;
                             stock.LastSellPrice = 0;
-                            RemoveOrders(Utility.OrderStatus.Sell, stock.NO);
-                            stock.MakeSell = false;
                             stock.RaiseStage = false;
                         }
                         if (stock.Buy1Price == 0)
