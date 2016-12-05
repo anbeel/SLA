@@ -10,6 +10,7 @@ using System.Threading;
 using System.IO;
 using System.Reflection;
 using System.Configuration;
+using System.Collections;
 
 namespace stockassistant
 {
@@ -635,8 +636,12 @@ namespace stockassistant
             {
                 Utility.Log("GetToday failed to find the program");
             }
-
-            status = Utility.GetTodayData(hwnd);
+            Hashtable stockNos = new Hashtable();
+            foreach(Stock stock in Stocks)
+            {
+                stockNos.Add(stock.NO, stock.Name);
+            }
+            status = Utility.GetTodayData(hwnd, stockNos);
 
             if (status == Utility.TodayStatus.BuyOverFlow)
             {
@@ -826,6 +831,14 @@ namespace stockassistant
                     return 0;
                 }
             }
+            else
+            {
+                decimal highPrice = stock.HighPrice - (stock.HighPrice * wave);
+                if (nextprice > highPrice)
+                {
+                    nextprice = highPrice;
+                }
+            }
             decimal lowestPrice = stock.PrePrice * decimal.Parse("0.901");
             if (nextprice < lowestPrice)
             {
@@ -922,6 +935,14 @@ namespace stockassistant
                 {
                     return 0;
                 }
+            }
+            else
+            {
+                decimal lowPrice = stock.LowPrice + (stock.LowPrice * wave);
+                if (nextprice < lowPrice)
+                {
+                    nextprice = lowPrice;
+                }                   
             }
             //}
             decimal higestPrice = stock.PrePrice * decimal.Parse("1.099");

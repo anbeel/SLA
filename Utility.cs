@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 using System.Configuration;
+using System.Collections;
 
 namespace stockassistant
 {
@@ -556,7 +557,7 @@ namespace stockassistant
             return childhand;
         }
 
-        public static TodayStatus GetTodayData(IntPtr hwnd)
+        public static TodayStatus GetTodayData(IntPtr hwnd, Hashtable stocks)
         {
             TodayStatus status = TodayStatus.Updated;
             try
@@ -613,11 +614,11 @@ namespace stockassistant
                                     decimal sellmoney = 0;
                                     for (int i = 0; i < listviewdatafortag.Count; i++)
                                     {
-                                        if (listviewdatafortag[i] == "买入")
+                                        if (listviewdatafortag[i] == "买入" && stocks.Contains(listviewdataforno[i]))
                                         {
                                             buymoney += decimal.Parse(listviewdataformoney[i]);
                                         }
-                                        else if (listviewdatafortag[i] == "卖出")
+                                        else if (listviewdatafortag[i] == "卖出" && stocks.Contains(listviewdataforno[i]))
                                         {
                                             if (!listviewdataforno[i].StartsWith("1318"))
                                             {
@@ -625,7 +626,7 @@ namespace stockassistant
                                             }
                                         }
                                     }
-                                    decimal OverFlowMoney = 5000;
+                                    decimal OverFlowMoney = 10000;
                                     decimal.TryParse(ConfigurationSettings.AppSettings["overflow"].ToString(), out OverFlowMoney);
 
                                     if ((buymoney-sellmoney) > OverFlowMoney)
