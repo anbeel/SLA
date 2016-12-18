@@ -29,6 +29,7 @@ namespace stockassistant
         private bool disablesynced = ConfigurationSettings.AppSettings["disablesync"] !=null? bool.Parse(System.Configuration.ConfigurationSettings.AppSettings["disablesync"]):false;
         private bool panenable = ConfigurationSettings.AppSettings["panenable"] != null ? bool.Parse(System.Configuration.ConfigurationSettings.AppSettings["panenable"]) : false;
         private decimal wave = ConfigurationSettings.AppSettings["wave"] != null ? decimal.Parse(System.Configuration.ConfigurationSettings.AppSettings["wave"].ToString()) : decimal.Parse("0.03");
+        private Dictionary<int, int[]> methods = new Dictionary<int, int[]>();
 
         #region Method
 
@@ -526,10 +527,6 @@ namespace stockassistant
                         CanSell = true,
                         CanBuy = true
                     };
-                    if (stock.StartNum < 3)
-                        stock.StartNum = 3;
-                    else if (stock.StartNum > 10)
-                        stock.StartNum = 10;
                     Stocks.Add(stock);
                     listBox1.Items.Add("编号:" + stock.NO + ",名称:" + stock.Name + ",数量:" + stock.HandNumber.ToString() + ",价格:" + stock.CurPrice.ToString("f2") + ",最后更新时间:" + stock.LastUpdatedTime);
                 }
@@ -773,17 +770,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 15; i++)
                 {
-                    nextprice = nextprice - (nextprice * ((decimal)(stock.StartNum - 2) / 100));
+                    nextprice = nextprice - (nextprice * ((decimal)(methods[stock.StartNum][2]) / 100));
                     if (oldprice >= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice - (nextprice * ((decimal)(stock.StartNum - 1) / 100));
+                    nextprice = nextprice - (nextprice * ((decimal)(methods[stock.StartNum][1]) / 100));
                     if (oldprice >= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice - (nextprice * ((decimal)stock.StartNum / 100));
+                    nextprice = nextprice - (nextprice * ((decimal)methods[stock.StartNum][0] / 100));
                     if (oldprice >= nextprice)
                     {
                         break;
@@ -794,17 +791,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 15; i++)
                 {
-                    nextprice = nextprice - (nextprice * ((decimal)stock.StartNum / 100));
+                    nextprice = nextprice - (nextprice * ((decimal)methods[stock.StartNum][0] / 100));
                     if (oldprice >= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice - (nextprice * ((decimal)(stock.StartNum - 1) / 100));
+                    nextprice = nextprice - (nextprice * ((decimal)(methods[stock.StartNum][1]) / 100));
                     if (oldprice >= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice - (nextprice * ((decimal)(stock.StartNum - 2) / 100));
+                    nextprice = nextprice - (nextprice * ((decimal)(methods[stock.StartNum][2]) / 100));
                     if (oldprice >= nextprice)
                     {
                         break;
@@ -875,17 +872,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 15; i++)
                 {
-                    nextprice = nextprice + (nextprice * ((decimal)stock.StartNum / 100));
+                    nextprice = nextprice + (nextprice * ((decimal)methods[stock.StartNum][0] / 100));
                     if (oldprice <= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice + (nextprice * ((decimal)(stock.StartNum - 1) / 100));
+                    nextprice = nextprice + (nextprice * ((decimal)(methods[stock.StartNum][1]) / 100));
                     if (oldprice <= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice + (nextprice * ((decimal)(stock.StartNum - 2) / 100));
+                    nextprice = nextprice + (nextprice * ((decimal)(methods[stock.StartNum][2]) / 100));
                     if (oldprice <= nextprice)
                     {
                         break;
@@ -896,17 +893,17 @@ namespace stockassistant
             {
                 for (int i = 0; i < 15; i++)
                 {
-                    nextprice = nextprice + (nextprice * ((decimal)(stock.StartNum - 2) / 100));
+                    nextprice = nextprice + (nextprice * ((decimal)(methods[stock.StartNum][2]) / 100));
                     if (oldprice <= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice + (nextprice * ((decimal)(stock.StartNum - 1) / 100));
+                    nextprice = nextprice + (nextprice * ((decimal)(methods[stock.StartNum][1]) / 100));
                     if (oldprice <= nextprice)
                     {
                         break;
                     }
-                    nextprice = nextprice + (nextprice * decimal.Parse((stock.StartNum / 100).ToString()));
+                    nextprice = nextprice + (nextprice * ((decimal)(methods[stock.StartNum][0]) / 100));
                     if (oldprice <= nextprice)
                     {
                         break;
@@ -1405,6 +1402,12 @@ namespace stockassistant
             ordersforsell = new Dictionary<string, string>();
 
             LoadData();
+
+            methods.Add(1, new int[] { 7, 6, 5 });
+            methods.Add(2, new int[] { 6, 5, 4 });
+            methods.Add(3, new int[] { 5, 4, 3 });
+            methods.Add(4, new int[] { 4, 3, 3 });
+            methods.Add(5, new int[] { 3, 3, 3 });
         }
 
         #endregion
@@ -1452,18 +1455,18 @@ namespace stockassistant
 
         private void button4_Click(object sender, EventArgs e)
         {
-            IntPtr hwnd = Utility.GetWindow();
-            if (Utility.ClickSell(hwnd))
-            {
-                System.Threading.Thread.Sleep(2000);
-                IntPtr dlghwnd = Utility.GetSellDialog(hwnd);
-                int maxnum;
-                Utility.GetInitSellPrice(dlghwnd, Stocks[0].NO, out maxnum);
-                if (maxnum < Stocks[0].Number)
-                {
-                    MessageBox.Show(string.Format("{0} less than the number {1}", maxnum, Stocks[0].Number));
-                }
-            }
+            //IntPtr hwnd = Utility.GetWindow();
+            //if (Utility.ClickSell(hwnd))
+            //{
+            //    System.Threading.Thread.Sleep(2000);
+            //    IntPtr dlghwnd = Utility.GetSellDialog(hwnd);
+            //    int maxnum;
+            //    Utility.GetInitSellPrice(dlghwnd, Stocks[0].NO, out maxnum);
+            //    if (maxnum < Stocks[0].Number)
+            //    {
+            //        MessageBox.Show(string.Format("{0} less than the number {1}", maxnum, Stocks[0].Number));
+            //    }
+            //}
             //UpdateTodayData();
             //Utility.GetWindow();
             //RemoveOrders(Utility.OrderStatus.All, "");
@@ -1482,6 +1485,69 @@ namespace stockassistant
             //    }
             //}
             //UpdateTodayData();
+
+            var test = methods.Count;
+            test = methods[test][2];
+
+            var test1 = ((decimal)(methods[1][2]) / 100);
+
+        }
+
+        private int GetMethod(decimal start, decimal end, bool status)
+        {
+            try
+            {
+                int res = 0;
+                decimal mincal = 100;
+
+                foreach (var method in methods)
+                {
+                    var cal1 = status ? start : end;
+                    for (int i = 0; i < 10; i++)
+                    {
+                        foreach (var value in method.Value)
+                        {
+                            if (status)
+                            {
+                                cal1 += cal1 * value / 100;
+                                if (end <= cal1)
+                                {
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                cal1 -= cal1 * value / 100;
+                                if (start >= cal1)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                        if (status && end <= cal1)
+                        {
+                            cal1 = cal1 - end;
+                            break;
+                        }
+                        else if (start >= cal1)
+                        {
+                            cal1 = start - cal1;
+                            break;
+                        }
+                    }
+                    if (cal1 < mincal)
+                    {
+                        mincal = cal1;
+                        res = method.Key;
+                    }
+                }
+                return res;
+            }
+            catch (Exception ex)
+            {
+                Utility.Log(string.Format("failed to get method ({0},{1};{3}).", start.ToString(), end.ToString(), status.ToString()) + ex.ToString());
+            }
+            return methods.Count;
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -1539,6 +1605,14 @@ namespace stockassistant
             {
                 return false;
             }
+        }
+
+        private void btnCal_Click(object sender, EventArgs e)
+        {
+            var start = decimal.Parse(mtxtlowestprice.Text);
+            var end = decimal.Parse(mtxthighestprice.Text);
+            bool status = chkraisedstage.Checked;
+            startNumber.Value = GetMethod(start, end, status);
         }
     }
 }
